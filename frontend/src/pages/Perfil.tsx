@@ -30,7 +30,7 @@ export default function Perfil() {
     if (!usuario) return;
     const query = `
       query {
-        pedidos(usuarioId: "${usuario.uid}") {
+        pedidos(usuarioId: "${usuario.id}") {
           id total estado fecha
           productos { nombre cantidad subtotal }
         }
