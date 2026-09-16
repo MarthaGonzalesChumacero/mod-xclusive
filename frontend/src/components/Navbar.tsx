@@ -32,7 +32,7 @@ export default function Navbar() {
             <Link to="/productos" className="text-sm font-medium text-neutral-200 hover:text-accent transition-colors tracking-wide">
               Catálogo
             </Link>
-            {usuario?.rol === 'administrador' && (
+            {(usuario?.rol === 'administrador' || usuario?.rol === 'admin') && (
               <Link to="/admin" className="flex items-center gap-1 text-sm font-medium text-accent hover:text-yellow-300 transition-colors">
                 <Shield size={15} /> Admin
               </Link>
@@ -87,7 +87,7 @@ export default function Navbar() {
       {menuAbierto && (
         <div className="md:hidden bg-neutral-800 px-4 pb-4 pt-2 space-y-3">
           <Link to="/productos" onClick={() => setMenuAbierto(false)} className="block text-sm py-2 hover:text-accent transition-colors">Catálogo</Link>
-          {usuario?.rol === 'administrador' && (
+          {(usuario?.rol === 'administrador' || usuario?.rol === 'admin') && (
             <Link to="/admin" onClick={() => setMenuAbierto(false)} className="block text-sm py-2 text-accent">Panel Admin</Link>
           )}
           {usuario ? (

@@ -7,15 +7,35 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Builds
+dist/
+**/dist/
+dist-ssr/
 *.local
+
+# Variables de entorno
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Credenciales Firebase / cuentas de servicio
+serviceAccount.json
+serviceAccount*.json
+**/serviceAccount.json
+**/serviceAccount*.json
+
+# Archivos temporales de pruebas
+scratch/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*

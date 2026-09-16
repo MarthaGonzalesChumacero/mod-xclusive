@@ -1,10 +1,18 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from 'react';
 
 interface Usuario {
-  uid: string;
+  uid?: string;
+  id?: string;
   nombre: string;
+  apellido?: string;
   email: string;
-  rol: string;
+  rol?: string;
 }
 
 interface AuthContextType {
@@ -15,26 +23,78 @@ interface AuthContextType {
   cargando: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const AuthContext = createContext<AuthContextType>(
+  {} as AuthContextType
+);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('usuario');
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUsuario(JSON.parse(storedUser));
+    try {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('usuario');
+
+      // Verificar que realmente existan datos válidos
+      if (
+        storedToken &&
+        storedUser &&
+        storedUser !== 'undefined' &&
+        storedUser !== 'null'
+      ) {
+        const usuarioGuardado = JSON.parse(storedUser);
+
+        setToken(storedToken);
+        setUsuario(usuarioGuardado);
+      } else {
+        // Limpiar datos incorrectos
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+
+        setToken(null);
+        setUsuario(null);
+      }
+    } catch (error) {
+      console.error(
+        'Error al recuperar la sesión:',
+        error
+      );
+
+      // Si hay datos dañados, los eliminamos
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+
+      setToken(null);
+      setUsuario(null);
+    } finally {
+      setCargando(false);
     }
-    setCargando(false);
   }, []);
 
-  const login = (newToken: string, newUsuario: Usuario) => {
+  const login = (
+    newToken: string,
+    newUsuario: Usuario
+  ) => {
+    // Evita guardar "undefined"
+    if (!newToken || !newUsuario) {
+      console.error(
+        'No se pudo guardar la sesión: token o usuario inválido'
+      );
+      return;
+    }
+
     localStorage.setItem('token', newToken);
-    localStorage.setItem('usuario', JSON.stringify(newUsuario));
+    localStorage.setItem(
+      'usuario',
+      JSON.stringify(newUsuario)
+    );
+
     setToken(newToken);
     setUsuario(newUsuario);
   };
@@ -42,12 +102,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
+
     setToken(null);
     setUsuario(null);
   };
 
   return (
-    <AuthContext.Provider value={{ usuario, token, login, logout, cargando }}>
+    <AuthContext.Provider
+      value={{
+        usuario,
+        token,
+        login,
+        logout,
+        cargando,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

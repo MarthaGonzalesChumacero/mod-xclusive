@@ -13,7 +13,7 @@ const resolvers = {
         query = query.where('usuarioId', '==', usuarioId);
       } else {
         // Si no especifica usuarioId, un cliente normal solo ve los suyos
-        if (context.usuario.rol !== 'administrador') {
+        if (context.usuario.rol !== 'administrador' && context.usuario.rol !== 'admin') {
           query = query.where('usuarioId', '==', context.usuario.id);
         }
       }
@@ -28,7 +28,7 @@ const resolvers = {
       if (!doc.exists) throw new Error('Pedido no encontrado');
 
       const pedido = doc.data();
-      if (pedido.usuarioId !== context.usuario.id && context.usuario.rol !== 'administrador') {
+      if (pedido.usuarioId !== context.usuario.id && context.usuario.rol !== 'administrador' && context.usuario.rol !== 'admin') {
         throw new Error('No autorizado para ver este pedido');
       }
 
@@ -99,7 +99,8 @@ const resolvers = {
     },
 
     actualizarEstadoPedido: async (_, { id, estado }, context) => {
-      if (!context.usuario || context.usuario.rol !== 'administrador') {
+      const esAdmin = context.usuario && (context.usuario.rol === 'administrador' || context.usuario.rol === 'admin');
+      if (!esAdmin) {
         throw new Error('No autorizado, requiere administrador');
       }
 
