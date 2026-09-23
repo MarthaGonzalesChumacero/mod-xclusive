@@ -1,7 +1,11 @@
-const GRAPHQL_URL = 'http://localhost:3000/graphql';
+const GRAPHQL_URL = 'https://empathetic-wonder-production-79aa.up.railway.app/graphql';
 
-export async function gqlRequest<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+export async function gqlRequest<T>(
+  query: string,
+  variables?: Record<string, unknown>
+): Promise<T> {
   const token = localStorage.getItem('token');
+
   const res = await fetch(GRAPHQL_URL, {
     method: 'POST',
     headers: {
@@ -10,7 +14,12 @@ export async function gqlRequest<T>(query: string, variables?: Record<string, un
     },
     body: JSON.stringify({ query, variables }),
   });
+
   const json = await res.json();
-  if (json.errors) throw new Error(json.errors[0].message);
+
+  if (json.errors) {
+    throw new Error(json.errors[0].message);
+  }
+
   return json.data as T;
 }
